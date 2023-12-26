@@ -23,3 +23,4 @@ After ending this project this is some of the features to be achieved
 ## References
 
 - [Database Basics](https://notes.eatonphil.com/database-basics.html)
+- [Build Database in C](https://cstack.github.io/db_tutorial/) - Reference for new features
