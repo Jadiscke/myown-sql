@@ -1,6 +1,9 @@
 package myownsql
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type location struct {
 	line uint
@@ -173,4 +176,148 @@ func lexNumeric(source string, ic cursor) (*token, cursor, bool) {
 		loc:   ic.loc,
 	}, cur, true
 
+}
+
+func lexCharacterDelimited(source string, ic cursor, delimiter byte) (*token, cursor, bool) {
+	cur := ic
+
+	if len(source[cur.pointer:]) == 0 {
+		return nil, ic, false
+	}
+
+	if source[cur.pointer] != delimiter {
+		return nil, ic, false
+	}
+
+	cur.loc.col++
+	cur.pointer++
+
+	var value []byte
+
+	for ; cur.pointer < uint(len(source)); cur.pointer++ {
+		character := source[cur.pointer]
+
+		if character == delimiter {
+			// To escape ' in SQL you should use ''
+			// Example 'It''s a good day to be alive'
+			if cur.pointer+1 >= uint(len(source)) || source[cur.pointer+1] != delimiter {
+				return &token{
+					value: string(value),
+					loc:   ic.loc,
+					kind:  stringKind,
+				}, cur, true
+			} else {
+				value = append(value, character)
+				cur.pointer++
+				cur.loc.col++
+			}
+		}
+
+		value = append(value, character)
+		cur.loc.col++
+	}
+
+	return nil, ic, false
+}
+
+func lexString(source string, ic cursor) (*token, cursor, bool) {
+	return lexCharacterDelimited(source, ic, '\'')
+}
+
+func longestMatch(source string, ic cursor, options []string) string {
+	var value []byte
+	var skipList []int
+	var match string
+
+	cur := ic
+
+	for cur.pointer < uint(len(source)) {
+
+		value = append(value, strings.ToLower(string(source[cur.pointer]))...)
+
+		cur.pointer++
+
+	match:
+		for i, option := range options {
+			for _, skip := range skipList {
+				if i == skip {
+					continue match
+				}
+			}
+			// Deal with cases like INT vs INTO
+
+			if option == string(value) {
+				skipList = append(skipList, i)
+				if len(option) > len(match) {
+					match = option
+				}
+
+				continue
+			}
+
+			sharesPrefix := string(value) == option[:cur.pointer-ic.pointer]
+
+			tooLong := len(value) > len(option)
+
+			if tooLong || !sharesPrefix {
+				skipList = append(skipList, i)
+			}
+		}
+
+		if len(skipList) == len(options) {
+			break
+		}
+	}
+
+	return match
+}
+
+func lexSymbol(source string, ic cursor) (*token, cursor, bool) {
+	character := source[ic.pointer]
+
+	cur := ic
+
+	cur.pointer++
+	cur.loc.col++
+
+	switch character {
+	// Remove whitespaces
+	case '\n':
+		cur.loc.line++
+		cur.loc.col = 0
+		fallthrough
+	case '\t':
+		fallthrough
+	case ' ':
+		return nil, cur, true
+	}
+
+	symbols := []symbol{
+		commaSymbol,
+		leftParenSymbol,
+		rightParenSymbol,
+		semicolonSymbol,
+		asteriskSymbol,
+	}
+
+	var options []string
+
+	for _, sym := range symbols {
+		options = append(options, string(sym))
+	}
+
+	match := longestMatch(source, ic, options)
+
+	if match == "" {
+		return nil, ic, false
+	}
+
+	cur.pointer = ic.pointer + uint(len(match))
+	cur.loc.col = ic.loc.col + uint(len(match))
+
+	return &token{
+		value: match,
+		kind:  symbolKind,
+		loc:   ic.loc,
+	}, cur, true
 }
