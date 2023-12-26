@@ -23,6 +23,7 @@ const (
 	valuesKeyword keyword = "values"
 	intKeyword    keyword = "int"
 	textKeyword   keyword = "text"
+	whereKeyword  keyword = "where"
 )
 
 type symbol string
@@ -319,5 +320,90 @@ func lexSymbol(source string, ic cursor) (*token, cursor, bool) {
 		value: match,
 		kind:  symbolKind,
 		loc:   ic.loc,
+	}, cur, true
+}
+
+func lexKeywords(source string, ic cursor) (*token, cursor, bool) {
+	cur := ic
+
+	keywords := []keyword{
+		selectKeyword,
+		insertKeyword,
+		valuesKeyword,
+		tableKeyword,
+		createKeyword,
+		whereKeyword,
+		fromKeyword,
+		intoKeyword,
+		textKeyword,
+	}
+
+	var options []string
+
+	for _, kw := range keywords {
+		options = append(options, string(kw))
+	}
+
+	match := longestMatch(source, ic, options)
+
+	if match == "" {
+		return nil, ic, false
+	}
+
+	cur.pointer = ic.pointer + uint(len(match))
+	cur.loc.col = ic.loc.col + uint(len(match))
+
+	return &token{
+		value: match,
+		kind:  keywordKind,
+		loc:   ic.loc,
+	}, cur, true
+}
+
+func lexIdentifier(source string, ic cursor) (*token, cursor, bool) {
+	//Handle separetely if is a double-quoted identifier
+	if token, newCursor, ok := lexCharacterDelimited(source, ic, '"'); ok {
+		return token, newCursor, true
+	}
+
+	cur := ic
+
+	character := source[cur.pointer]
+
+	isAlphabetical := (character >= 'A' && character <= 'Z') || (character >= 'a' && character <= 'z')
+
+	if !isAlphabetical {
+		return nil, ic, false
+	}
+
+	cur.pointer++
+	cur.loc.col++
+
+	value := []byte{character}
+
+	for ; cur.pointer < uint(len(source)); cur.pointer++ {
+		character = source[cur.pointer]
+
+		isAlphabetical = (character >= 'A' && character <= 'Z') || (character >= 'a' && character <= 'z')
+		isNumeric := character >= '0' && character <= '9'
+
+		if isAlphabetical || isNumeric || character == '_' || character == '$' {
+			value = append(value, character)
+
+			cur.loc.col++
+			continue
+		}
+
+		break
+	}
+
+	if len(value) == 0 {
+		return nil, ic, false
+	}
+
+	return &token{
+		value: strings.ToLower(string(value)),
+		loc:   ic.loc,
+		kind:  identifierKind,
 	}, cur, true
 }
