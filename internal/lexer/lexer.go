@@ -1,4 +1,4 @@
-package myownsql
+package lexer
 
 import (
 	"fmt"
@@ -49,7 +49,7 @@ const (
 	identifierKind
 )
 
-type token struct {
+type Token struct {
 	value string
 	kind  tokenKind
 	loc   location
@@ -60,14 +60,14 @@ type cursor struct {
 	loc     location
 }
 
-func (t *token) Equals(other *token) bool {
+func (t *Token) Equals(other *Token) bool {
 	return t.value == other.value && t.kind == other.kind
 }
 
-type lexer func(string, cursor) (*token, cursor, bool)
+type lexer func(string, cursor) (*Token, cursor, bool)
 
-func lex(source string) ([]*token, error) {
-	tokens := []*token{}
+func lex(source string) ([]*Token, error) {
+	tokens := []*Token{}
 	cur := cursor{}
 
 lex:
@@ -104,7 +104,7 @@ lex:
 
 }
 
-func lexNumeric(source string, ic cursor) (*token, cursor, bool) {
+func lexNumeric(source string, ic cursor) (*Token, cursor, bool) {
 	cur := ic
 
 	periodFound := false
@@ -174,7 +174,7 @@ func lexNumeric(source string, ic cursor) (*token, cursor, bool) {
 		return nil, ic, false
 	}
 
-	return &token{
+	return &Token{
 		value: source[ic.pointer:cur.pointer],
 		kind:  numericKind,
 		loc:   ic.loc,
@@ -182,7 +182,7 @@ func lexNumeric(source string, ic cursor) (*token, cursor, bool) {
 
 }
 
-func lexCharacterDelimited(source string, ic cursor, delimiter byte) (*token, cursor, bool) {
+func lexCharacterDelimited(source string, ic cursor, delimiter byte) (*Token, cursor, bool) {
 	cur := ic
 
 	if len(source[cur.pointer:]) == 0 {
@@ -205,7 +205,7 @@ func lexCharacterDelimited(source string, ic cursor, delimiter byte) (*token, cu
 			// To escape ' in SQL you should use ''
 			// Example 'It''s a good day to be alive'
 			if cur.pointer+1 >= uint(len(source)) || source[cur.pointer+1] != delimiter {
-				return &token{
+				return &Token{
 					value: string(value),
 					loc:   ic.loc,
 					kind:  stringKind,
@@ -224,7 +224,7 @@ func lexCharacterDelimited(source string, ic cursor, delimiter byte) (*token, cu
 	return nil, ic, false
 }
 
-func lexString(source string, ic cursor) (*token, cursor, bool) {
+func lexString(source string, ic cursor) (*Token, cursor, bool) {
 	return lexCharacterDelimited(source, ic, '\'')
 }
 
@@ -276,7 +276,7 @@ func longestMatch(source string, ic cursor, options []string) string {
 	return match
 }
 
-func lexSymbol(source string, ic cursor) (*token, cursor, bool) {
+func lexSymbol(source string, ic cursor) (*Token, cursor, bool) {
 	character := source[ic.pointer]
 
 	cur := ic
@@ -319,14 +319,14 @@ func lexSymbol(source string, ic cursor) (*token, cursor, bool) {
 	cur.pointer = ic.pointer + uint(len(match))
 	cur.loc.col = ic.loc.col + uint(len(match))
 
-	return &token{
+	return &Token{
 		value: match,
 		kind:  symbolKind,
 		loc:   ic.loc,
 	}, cur, true
 }
 
-func lexKeyword(source string, ic cursor) (*token, cursor, bool) {
+func lexKeyword(source string, ic cursor) (*Token, cursor, bool) {
 	cur := ic
 
 	keywords := []keyword{
@@ -357,14 +357,14 @@ func lexKeyword(source string, ic cursor) (*token, cursor, bool) {
 	cur.pointer = ic.pointer + uint(len(match))
 	cur.loc.col = ic.loc.col + uint(len(match))
 
-	return &token{
+	return &Token{
 		value: match,
 		kind:  keywordKind,
 		loc:   ic.loc,
 	}, cur, true
 }
 
-func lexIdentifier(source string, ic cursor) (*token, cursor, bool) {
+func lexIdentifier(source string, ic cursor) (*Token, cursor, bool) {
 	//Handle separetely if is a double-quoted identifier
 	if token, newCursor, ok := lexCharacterDelimited(source, ic, '"'); ok {
 		return token, newCursor, true
@@ -405,7 +405,7 @@ func lexIdentifier(source string, ic cursor) (*token, cursor, bool) {
 		return nil, ic, false
 	}
 
-	return &token{
+	return &Token{
 		value: strings.ToLower(string(value)),
 		loc:   ic.loc,
 		kind:  identifierKind,

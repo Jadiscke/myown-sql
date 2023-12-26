@@ -1,4 +1,4 @@
-package myownsql
+package lexer
 
 import (
 	"strings"
