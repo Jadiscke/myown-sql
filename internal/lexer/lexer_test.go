@@ -277,12 +277,12 @@ func TestToken_lexKeyword(t *testing.T) {
 func TestLex(t *testing.T) {
 	tests := []struct {
 		input  string
-		Tokens []token
+		Tokens []Token
 		err    error
 	}{
 		{
 			input: "select a",
-			Tokens: []token{
+			Tokens: []Token{
 				{
 					loc:   location{col: 0, line: 0},
 					value: string(selectKeyword),
@@ -297,7 +297,7 @@ func TestLex(t *testing.T) {
 		},
 		{
 			input: "select true",
-			Tokens: []token{
+			Tokens: []Token{
 				{
 					loc:   location{col: 0, line: 0},
 					value: string(selectKeyword),
@@ -312,7 +312,7 @@ func TestLex(t *testing.T) {
 		},
 		{
 			input: "select 1",
-			Tokens: []token{
+			Tokens: []Token{
 				{
 					loc:   location{col: 0, line: 0},
 					value: string(selectKeyword),
@@ -328,7 +328,7 @@ func TestLex(t *testing.T) {
 		},
 		{
 			input: "CREATE TABLE u (id INT, name TEXT)",
-			Tokens: []token{
+			Tokens: []Token{
 				{
 					loc:   location{col: 0, line: 0},
 					value: string(createKeyword),
@@ -383,7 +383,7 @@ func TestLex(t *testing.T) {
 		},
 		{
 			input: "insert into users Values (105, 233)",
-			Tokens: []token{
+			Tokens: []Token{
 				{
 					loc:   location{col: 0, line: 0},
 					value: string(insertKeyword),
@@ -434,7 +434,7 @@ func TestLex(t *testing.T) {
 		},
 		{
 			input: "SELECT id FROM users;",
-			Tokens: []token{
+			Tokens: []Token{
 				{
 					loc:   location{col: 0, line: 0},
 					value: string(selectKeyword),
