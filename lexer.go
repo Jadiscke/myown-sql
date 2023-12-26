@@ -34,6 +34,7 @@ const (
 	commaSymbol      symbol = ","
 	leftParenSymbol  symbol = "("
 	rightParenSymbol symbol = ")"
+	concatSymbol     symbol = "||"
 )
 
 type tokenKind uint
@@ -41,9 +42,11 @@ type tokenKind uint
 const (
 	keywordKind tokenKind = iota
 	symbolKind
-	identifierKind
+	istringKind
 	stringKind
 	numericKind
+	boolKind
+	identifierKind
 )
 
 type token struct {
@@ -57,7 +60,7 @@ type cursor struct {
 	loc     location
 }
 
-func (t *token) equals(other *token) bool {
+func (t *token) Equals(other *token) bool {
 	return t.value == other.value && t.kind == other.kind
 }
 
@@ -323,7 +326,7 @@ func lexSymbol(source string, ic cursor) (*token, cursor, bool) {
 	}, cur, true
 }
 
-func lexKeywords(source string, ic cursor) (*token, cursor, bool) {
+func lexKeyword(source string, ic cursor) (*token, cursor, bool) {
 	cur := ic
 
 	keywords := []keyword{
@@ -336,6 +339,7 @@ func lexKeywords(source string, ic cursor) (*token, cursor, bool) {
 		fromKeyword,
 		intoKeyword,
 		textKeyword,
+		intKeyword,
 	}
 
 	var options []string
