@@ -1,10 +1,8 @@
-package ast
+package parser
 
 import (
 	"github.com/Jadiscke/myown-sql/internal/lexer"
 )
-
-type token lexer.Token
 
 type expressionKind uint
 
@@ -13,7 +11,7 @@ const (
 )
 
 type expression struct {
-	Literal *token
+	Literal *lexer.Token
 	Kind    expressionKind
 }
 
@@ -37,21 +35,21 @@ type Statement struct {
 }
 
 type InsertStatement struct {
-	Table  token
+	Table  lexer.Token
 	Values *[]*expression
 }
 
 type columnDefinition struct {
-	Name     token
-	Datatype token
+	Name     lexer.Token
+	Datatype lexer.Token
 }
 
 type CreateTableStatement struct {
-	Name token
+	Name lexer.Token
 	Cols *[]*columnDefinition
 }
 
 type SelectStatement struct {
 	Item []*expression
-	From token
+	From lexer.Token
 }
