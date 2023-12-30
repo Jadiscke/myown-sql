@@ -61,5 +61,5 @@ status: in progress
 ## Reference
 
 - [Database Basics - GO](https://notes.eatonphil.com/database-basics.html)
-- [JSON parser] (https://notes.eatonphil.com/writing-a-simple-json-parser.html)
+- [JSON parser](https://notes.eatonphil.com/writing-a-simple-json-parser.html)
 - [Let's build a simple database - C](https://cstack.github.io/db_tutorial/)
