@@ -15,26 +15,26 @@ type Keyword string
 const (
 	SelectKeyword Keyword = "select"
 	FromKeyword   Keyword = "from"
-	asKeyord      Keyword = "as"
-	tableKeyword  Keyword = "table"
-	createKeyword Keyword = "create"
-	insertKeyword Keyword = "insert"
-	intoKeyword   Keyword = "into"
-	valuesKeyword Keyword = "values"
-	intKeyword    Keyword = "int"
-	textKeyword   Keyword = "text"
-	whereKeyword  Keyword = "where"
+	AsKeyord      Keyword = "as"
+	TableKeyword  Keyword = "table"
+	CreateKeyword Keyword = "create"
+	InsertKeyword Keyword = "insert"
+	IntoKeyword   Keyword = "into"
+	ValuesKeyword Keyword = "values"
+	IntKeyword    Keyword = "int"
+	TextKeyword   Keyword = "text"
+	WhereKeyword  Keyword = "where"
 )
 
 type Symbol string
 
 const (
 	SemicolonSymbol  Symbol = ";"
-	asteriskSymbol   Symbol = "*"
+	AsteriskSymbol   Symbol = "*"
 	CommaSymbol      Symbol = ","
-	leftParenSymbol  Symbol = "("
-	rightParenSymbol Symbol = ")"
-	concatSymbol     Symbol = "||"
+	LeftParenSymbol  Symbol = "("
+	RightParenSymbol Symbol = ")"
+	ConcatSymbol     Symbol = "||"
 )
 
 type TokenKind uint
@@ -42,10 +42,10 @@ type TokenKind uint
 const (
 	KeywordKind TokenKind = iota
 	SymbolKind
-	istringKind
+	IstringKind
 	StringKind
 	NumericKind
-	boolKind
+	BoolKind
 	IdentifierKind
 )
 
@@ -298,10 +298,10 @@ func lexSymbol(source string, ic cursor) (*Token, cursor, bool) {
 
 	symbols := []Symbol{
 		CommaSymbol,
-		leftParenSymbol,
-		rightParenSymbol,
+		LeftParenSymbol,
+		RightParenSymbol,
 		SemicolonSymbol,
-		asteriskSymbol,
+		AsteriskSymbol,
 	}
 
 	var options []string
@@ -331,15 +331,15 @@ func lexKeyword(source string, ic cursor) (*Token, cursor, bool) {
 
 	keywords := []Keyword{
 		SelectKeyword,
-		insertKeyword,
-		valuesKeyword,
-		tableKeyword,
-		createKeyword,
-		whereKeyword,
+		InsertKeyword,
+		ValuesKeyword,
+		TableKeyword,
+		CreateKeyword,
+		WhereKeyword,
 		FromKeyword,
-		intoKeyword,
-		textKeyword,
-		intKeyword,
+		IntoKeyword,
+		TextKeyword,
+		IntKeyword,
 	}
 
 	var options []string

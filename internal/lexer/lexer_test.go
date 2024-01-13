@@ -331,12 +331,12 @@ func TestLex(t *testing.T) {
 			Tokens: []Token{
 				{
 					Loc:   Location{Col: 0, Line: 0},
-					Value: string(createKeyword),
+					Value: string(CreateKeyword),
 					Kind:  KeywordKind,
 				},
 				{
 					Loc:   Location{Col: 7, Line: 0},
-					Value: string(tableKeyword),
+					Value: string(TableKeyword),
 					Kind:  KeywordKind,
 				},
 				{
@@ -386,12 +386,12 @@ func TestLex(t *testing.T) {
 			Tokens: []Token{
 				{
 					Loc:   Location{Col: 0, Line: 0},
-					Value: string(insertKeyword),
+					Value: string(InsertKeyword),
 					Kind:  KeywordKind,
 				},
 				{
 					Loc:   Location{Col: 7, Line: 0},
-					Value: string(intoKeyword),
+					Value: string(IntoKeyword),
 					Kind:  KeywordKind,
 				},
 				{
@@ -401,7 +401,7 @@ func TestLex(t *testing.T) {
 				},
 				{
 					Loc:   Location{Col: 18, Line: 0},
-					Value: string(valuesKeyword),
+					Value: string(ValuesKeyword),
 					Kind:  KeywordKind,
 				},
 				{

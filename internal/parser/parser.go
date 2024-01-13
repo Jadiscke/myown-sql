@@ -214,3 +214,15 @@ func parseSelectStatement(tokens []*lexer.Token, initialCursor uint, delimiter l
 	}
 	return &slct, cursor, true
 }
+
+func parseInsertStatement(tokens []*lexer.Token, initialCursor uint, delimiter lexer.Token) (*InsertStatement, uint, bool) {
+	cursor := initialCursor
+
+	// Look for INSERT
+
+	if !expectToken(tokens, cursor, tokenFromKeyword(lexer.InsertKeyword)) {
+		return nil, initialCursor, false
+	}
+
+	return nil, initialCursor, false
+}
